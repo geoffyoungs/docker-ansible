@@ -1,0 +1,128 @@
+---
+- hosts: all
+  serial: 1
+  tasks: 
+    - name: ensure base packages installed
+      apt: pkg={{ item }} state=present
+      with_items:
+        - build-essential
+        - openssh-server
+
+# Apache
+    - name: ensure apache packages installed
+      apt: pkg={{ item }} state=present
+      with_items:
+        - apache2-mpm-prefork
+        - libcurl4-openssl-dev
+        - libssl-dev
+        - apache2-prefork-dev
+        - libapr1-dev
+        - libaprutil1-dev
+        - libapache2-mod-xsendfile
+
+# Local redis server
+    - name: ensure redis packages installed
+      apt: pkg={{ item }} state=present
+      with_items:
+        - redis-server
+
+# Postfix mail
+    - name: ensure postfix packages installed
+      apt: pkg={{ item }} state=present
+      with_items:
+        - postfix
+
+# ruby build-dependencies
+    - name: ensure ruby-gnome2 dep packages installed
+      apt: pkg={{ item }} state=present
+      with_items:
+        - libpng12-dev
+        - libxmu-dev
+        - librsvg2-dev
+        - libvte-dev
+        - libpoppler-glib-dev
+        - pkg-config
+        - libgstreamer0.10-dev
+        - libgstreamer-plugins-base0.10-dev
+        - libgoocanvas-dev
+        - libgtksourceview2.0-dev
+        - libdrm-dev
+        - libjpeg-dev
+
+# Needed for nokogiri
+    - name: ensure nokogiri packages installed
+      apt: pkg={{ item }} state=present
+      with_items:
+        - libxml2-dev
+        - libxslt1-dev
+
+# Needed for mysql
+    - name: ensure mysqlclient packages installed
+      apt: pkg={{ item }} state=present
+      with_items:
+        - libmysqlclient18-dev
+
+# For RMagick gem
+    - name: ensure imagemagick libs installed
+      apt: pkg={{ item }} state=present
+      with_items:
+        - libmagickcore-dev
+        - libmagickwand-dev
+
+# For jpegicc
+    - name: ensure colour management packages installed
+      apt: pkg={{ item }} state=present
+      with_items:
+        - liblcms-utils
+
+# Misc utils
+    - name: ensure misc utils packages installed
+      apt: pkg={{ item }} state=present
+      with_items:
+        - pv
+        - vim
+        - zip
+        - curl
+        - wget
+        - unzip
+        - strace
+        - gdb
+        - latencytop
+        - htop
+
+# Requirements for ruby
+    - name: ensure ruby dep packages installed
+      apt: pkg={{ item }} state=present
+      with_items:
+        - openssl
+        - libreadline6-dev
+        - curl
+        - git-core
+        - zlib1g-dev
+        - libssl-dev
+        - libyaml-dev
+        - libsqlite3-dev
+        - sqlite3
+        - libxml2-dev
+        - libxslt1-dev
+        - autoconf
+        - libc6-dev
+        - libncurses5-dev
+        - automake
+        - libtool
+        - bison
+        - subversion
+        - pkg-config
+
+# Install sstephenson's ruby-build
+    - name: checkout ruby-build
+      git: repo=https://github.com/sstephenson/ruby-build.git dest=/opt/ruby-build
+
+    - name: install ruby-build
+      shell: /opt/ruby-build/install.sh creates=/usr/local/bin/ruby-build
+
+    - name: build & install ruby
+      command: ruby-build 2.0.0-p353 /usr/local creates=/usr/local/bin/ruby
+
+    - name: install gtk2
+      gem: name=gtk2 state=present version=2.1.0
